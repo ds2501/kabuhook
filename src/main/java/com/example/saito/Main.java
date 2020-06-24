@@ -1,9 +1,9 @@
 package com.example.saito;
-/*
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
-*/
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 /*
@@ -11,8 +11,6 @@ Twitterから株価情報抽出するアプリ
 */
 
 public class Main {
-    private static final String SLACK_INCOMING_WEBHOOK_BUY = "";
-    private static final String SLACK_INCOMING_WEBHOOK_SELL = "";
     private static final int WAIT_TIME_SECONDS = 10;//何秒ごとに実行するか（10秒以上で設定可能）
 
     public static void main(String[] args) {
@@ -21,8 +19,9 @@ public class Main {
         //タイマー
         Timer timer = new Timer();
         //Slack送信用オブジェクト
-        Slack sellSlack = new Slack(SLACK_INCOMING_WEBHOOK_SELL, "#kabu-sell", "tanukiti");
-        Slack buySlack = new Slack(SLACK_INCOMING_WEBHOOK_BUY, "#kabu-buy", "tanukiti");
+        String[] properties = getProperties();
+        Slack sellSlack = new Slack(properties[0], "#kabu-sell", "tanukiti");
+        Slack buySlack = new Slack(properties[1], "#kabu-buy", "tanukiti");
         //タスク
         TimerTask task = new TimerTask() {
             //実行内容
@@ -34,6 +33,22 @@ public class Main {
             }
         };
         //WAIT_TIME_SECONDS*1000[ms]後に初実行、その後はWAIT_TIME_SECONDS*1000[ms]ごとに再実行
-        timer.scheduleAtFixedRate(task, WAIT_TIME_SECONDS*1000, WAIT_TIME_SECONDS*1000);
+        timer.scheduleAtFixedRate(task, WAIT_TIME_SECONDS * 1000, WAIT_TIME_SECONDS * 1000);
+    }
+
+    public static String[] getProperties() {
+        Properties settings = new Properties();
+        InputStream in;
+        String path = "";//properties file path
+        try {
+            in = new FileInputStream(path);
+            settings.load(in);
+            in.close();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        settings.list(System.out);
+
+        return new String[]{settings.getProperty("buy_channel"), settings.getProperty("sell_channel")};
     }
 }
