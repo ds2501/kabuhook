@@ -92,7 +92,7 @@ public class Slack {
         if (text.contains("DM")) {
             section_field6.put("text", ":dancer:*DM:*\n:ok:");
         } else {
-            section_field6.put("text", ":dancer:*DM:*\n:進入禁止:");
+            section_field6.put("text", ":dancer:*DM:*\n:no_entry:");
         }
         JSONArray filedsArray = new JSONArray();
         filedsArray.put(section_field1);
